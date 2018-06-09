@@ -20,15 +20,15 @@ extern "C" {
 using std::auto_ptr;
 
 static float * readAudioPCM(
-    size_t *nchannel,
-    size_t *sample_resolution,
-    unsigned char *input_buffer,
-    size_t *nsample
+    size_t nchannel,
+    size_t sample_resolution,
+    unsigned char input_buffer,
+    size_t nsample
 )
 {
-    float *buffer = new float[nsample];
+    float *buffer = new float[int(nsample)];
 
-    size_t iPoint, index = 0;
+    size_t iChannel, iPoint, index = 0;
 
     switch (sample_resolution)
         {
@@ -83,7 +83,7 @@ float *AudioReader::readAudio(
     long dist_sample_rate = SAMPLE_RATE;
 
     float *input_buffer;
-    input_buffer = readAudioPCM(nchannel, sample_resolution, buffer, nsample)
+    input_buffer = readAudioPCM(*nchannel, *sample_resolution, buffer, *nsample)
 
     if (dist_sample_rate == orig_sr)
     {
@@ -102,9 +102,9 @@ float *AudioReader::readAudio(
     }
 
     /* allocate output buffer for conversion */
-    size_t outbufferlength = sr_ratio * nsample;
-    float *outbuffer = new float[outbufferlength];
-    auto_ptr<float> outbuffer_auto(outbuffer);
+    output_buffer_length = sr_ratio * nsample;
+    float *output_buffer = new float[output_buffer_length];
+    auto_ptr<float> output_buffer_auto(output_buffer);
 
     int error;
     SRC_STATE *src_state = src_new(SRC_LINEAR, 1, &error);
@@ -114,10 +114,10 @@ float *AudioReader::readAudio(
     }
 
     SRC_DATA src_data;
-    src_data.data_in = inbuffer;
-    src_data.data_out = outbuffer;
-    src_data.input_frames = inbufferlength;
-    src_data.output_frames = outbufferlength;
+    src_data.data_in = input_buffer;
+    src_data.data_out = output_buffer;
+    src_data.input_frames = nsample;
+    src_data.output_frames = output_buffer_length;
     src_data.end_of_input = SF_TRUE;
     src_data.src_ratio = sr_ratio;
 
@@ -128,12 +128,9 @@ float *AudioReader::readAudio(
         src_delete(src_state);
         throw ResampleError();
     }
-
-    *buflen = src_data.output_frames;
-    *output_buffer_length = src_data.output_frames;
     src_delete(src_state);
 
-    return outbuffer_auto.release();
+    return output_buffer_auto.release();
 }
 
 AudioReader::AudioReader(unsigned sr)
