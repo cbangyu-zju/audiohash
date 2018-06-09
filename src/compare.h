@@ -13,8 +13,8 @@ class Compare{
 
 public:
     HashPattern pattern;
-    void setPattern(uint32_t *hash, uint32_t nframes, const char *name);
-    float compare(const uint32_t *hash);
+    void setPattern(uint32_t *hash, uint32_t nframes);
+    float compare(const uint32_t *hash, uint32_t nframes);
 };
 
 #endif
