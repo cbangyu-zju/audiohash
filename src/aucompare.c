@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     size_t sample_resolution = 8;
     size_t sample_rate = 44100;
     size_t nsample = 100;
-    unsigned char* buffer = new unsigned char[int(nsample)];
+    unsigned char* buffer = new unsigned char[100];
 
     config = new_audiohash_config();
 
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    score = audio_compare(config,  &stream_type, &nchannel, &sample_resolution, &sample_rate, buffer, &nsample);
+    score = audio_compare(config, stream_type, &nchannel, &sample_resolution, &sample_rate, buffer, &nsample);
 
     if (0 == score)
     {
