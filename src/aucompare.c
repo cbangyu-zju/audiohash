@@ -13,12 +13,12 @@ int main(int argc, char **argv)
     void *config = NULL;
     int error = 0;
     double score = 0;
-    const char stream_type = "PCM";
+    const char *stream_type = "PCM";
     size_t nchannel = 1;
     size_t sample_resolution = 8;
     size_t sample_rate = 44100;
     size_t nsample = 100;
-    unsigned char *buffer = new float[nsample];
+    unsigned char *buffer = new unsigned char[int(nsample)];
 
     config = new_audiohash_config();
 
