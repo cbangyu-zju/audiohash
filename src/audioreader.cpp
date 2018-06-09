@@ -102,7 +102,7 @@ float *AudioReader::readAudio(
     }
 
     /* allocate output buffer for conversion */
-    output_buffer_length = (size_t)(sr_ratio * (*nsample);
+    output_buffer_length = (size_t)(sr_ratio * (*nsample));
     float *output_buffer = new float[int(*output_buffer_length)];
     auto_ptr<float> output_buffer_auto(output_buffer);
 
