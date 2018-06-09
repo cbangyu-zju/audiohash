@@ -45,7 +45,7 @@ void *new_audiohash_config()
     return new AudioHashConfig(8000, 4096, 400, 0.001);
 }
 
-int set_pattern_audio(void *config,
+int set_pattern_audio(void *_config,
                       const char *stream_type,
                       size_t *nchannel,
                       size_t *sample_resolution,
@@ -84,7 +84,7 @@ int set_pattern_audio(void *config,
     return error;
 }
 
-float audio_compare(void *config,
+float audio_compare(void *_config,
                     const char *stream_type,
                     size_t *nchannel,
                     size_t *sample_resolution,
