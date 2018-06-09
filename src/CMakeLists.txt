@@ -9,7 +9,7 @@ add_definitions(-D_POSIX_C_SOURCE=200809L -D_GNU_SOURCE -g -Wall -O3 -shared -fP
 add_library(audiohash SHARED hashcalculator.cpp audioreader.cpp fft.cpp error.cpp compare.cpp capi.cpp)
 target_link_libraries(audiohash sndfile mpg123 samplerate)
 
-add_executable(aucompare aucompare.c)
+add_executable(aucompare aucompare.cpp)
 target_link_libraries(aucompare audiohash)
 set(PERMS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
           GROUP_READ GROUP_EXECUTE 
