@@ -85,7 +85,7 @@ float *AudioReader::readAudio(
     float *input_buffer;
     input_buffer = readAudioPCM(*nchannel, *sample_resolution, buffer, *nsample);
 
-    if (dist_sample_rate == sample_rate)
+    if (dist_sample_rate == *sample_rate)
     {
         *output_buffer_length = *nsample;
         return input_buffer;
@@ -102,8 +102,8 @@ float *AudioReader::readAudio(
     }
 
     /* allocate output buffer for conversion */
-    output_buffer_length = (size_t)(sr_ratio * nsample);
-    float *output_buffer = new float[int(output_buffer_length)];
+    output_buffer_length = (size_t)(sr_ratio * (*nsample);
+    float *output_buffer = new float[int(*output_buffer_length)];
     auto_ptr<float> output_buffer_auto(output_buffer);
 
     int error;
