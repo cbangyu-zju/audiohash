@@ -34,7 +34,7 @@ public:
 
     ~HashCalculator();
 
-    uint32_t *calchash(float *buf, size_t N, size_t *nframes);
+    uint32_t *calcHash(float *buf, size_t N, size_t *nframes);
 };
 
 #endif

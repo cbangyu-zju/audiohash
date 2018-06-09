@@ -45,19 +45,25 @@ void *new_audiohash_config()
     return new AudioHashConfig(8000, 4096, 400, 0.001);
 }
 
-int set_pattern_audio(void *_config, const char *filename)
+int set_pattern_audio(void *config,
+                      const char *stream_type,
+                      size_t *nchannel,
+                      size_t *sample_resolution,
+                      size_t *sample_rate,
+                      unsigned char *buffer,
+                      size_t *nsample)
 {
     int error = 0;
-    size_t buflen, nframes;
+    size_t output_buffer_length, nframes;
     float *sigbuf = NULL;
     uint32_t *hash = NULL;
     AudioHashConfig *config = (AudioHashConfig *)_config;
 
     try
     {
-        sigbuf = config->reader->readaudio(filename, &buflen);
-        hash = config->calculator->calchash(sigbuf, buflen, &nframes);
-        config->compare->setPattern(hash, nframes, filename);
+        sigbuf = config->reader->readAudio(stream_type, nchannel, sample_resolution, sample_rate, buffer, nsample, &output_buffer_length);
+        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes);
+        config->compare->setPattern(hash, nframes);
     }
     catch (std::exception &e)
     {
@@ -78,10 +84,16 @@ int set_pattern_audio(void *_config, const char *filename)
     return error;
 }
 
-float audio_compare(void *_config, const char *filename)
+float audio_compare(void *config,
+                    const char *stream_type,
+                    size_t *nchannel,
+                    size_t *sample_resolution,
+                    size_t *sample_rate,
+                    unsigned char *buffer,
+                    size_t *nsample)
 {
     int error = 0;
-    size_t buflen, nframes;
+    size_t output_buffer_length, nframes;
     float *sigbuf = NULL;
     uint32_t *hash = NULL;
     float score = 0.5;
@@ -89,8 +101,8 @@ float audio_compare(void *_config, const char *filename)
 
     try
     {
-        sigbuf = config->reader->readaudio(filename, &buflen);
-        hash = config->calculator->calchash(sigbuf, buflen, &nframes);
+        sigbuf = config->reader->readAudio(stream_type, nchannel, sample_resolution, sample_rate, buffer, nsample, &output_buffer_length);
+        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes);
         score = config->compare->compare(hash, nframes);
         return score;
     }

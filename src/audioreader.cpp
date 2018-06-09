@@ -19,208 +19,90 @@ extern "C" {
 
 using std::auto_ptr;
 
-static
-float *readaudio_mp3(
-    const char *filename,
-    long *sr,
-    const float nbsecs,
-    size_t *buflen)
+static float * readAudioPCM(
+    size_t *nchannel,
+    size_t *sample_resolution,
+    unsigned char *input_buffer,
+    size_t *nsample
+)
 {
-    mpg123_handle *m;
-    int ret;
+    float *buffer = new float[nsample];
 
-    if (mpg123_init() != MPG123_OK ||
-            (m = mpg123_new(NULL, &ret)) == NULL ||
-            mpg123_open(m, filename) != MPG123_OK)
-    {
-        throw FileOpenError();
-    }
+    size_t iPoint, index = 0;
 
-    /*turn off logging */
-    mpg123_param(m, MPG123_ADD_FLAGS, MPG123_QUIET, 0);
-
-    size_t totalsamples;
-
-    mpg123_scan(m);
-    totalsamples = mpg123_length(m);
-
-    int iChannel, nChannel, encoding;
-    if (mpg123_getformat(m, sr, &nChannel, &encoding) != MPG123_OK)
-    {
-        throw BadFormatError();
-    }
-
-    mpg123_format_none(m);
-    mpg123_format(m, *sr, nChannel, encoding);
-
-    size_t decbuflen = mpg123_outblock(m);
-
-    unsigned char *decbuf = new unsigned char[decbuflen];
-    auto_ptr<unsigned char> decbuf_auto(decbuf);
-
-    size_t nbsamples = (nbsecs <= 0) ? totalsamples : nbsecs * (*sr);
-    nbsamples = (nbsamples < totalsamples) ? nbsamples : totalsamples;
-
-    size_t iPoint, nPoint, index = 0, done;
-
-    float *buffer = new float[nbsamples];
-    auto_ptr<float> buffer_auto(buffer);
-
-    *buflen = nbsamples;
-
-    do
-    {
-        ret = mpg123_read(m, decbuf, decbuflen, &done);
-        switch (encoding)
+    switch (sample_resolution)
         {
-        case MPG123_ENC_SIGNED_16 :
-            nPoint = done / sizeof(short);
-            for (iPoint = 0; iPoint < nPoint; iPoint += nChannel)
+        case 8:
+            for (iPoint = 0; iPoint < nsample; iPoint += nchannel)
             {
-                buffer[index] = 0.0f;
-                for (iChannel = 0; iChannel < nChannel ; iChannel++)
+                input_buffer[index] = 0.0f;
+                for (iChannel = 0; iChannel < nchannel ; iChannel++)
                 {
-                    buffer[index] += abs(((short *)decbuf)[iPoint + iChannel]) / (float)SHRT_MAX;
+                    input_buffer[index] += abs(((char *)input_buffer)[iPoint + iChannel]) / (float)SCHAR_MAX;
                 }
-                buffer[index++] /= nChannel;
-                if (index >= nbsamples) break;
+                buffer[index++] /= nchannel;
             }
             break;
-        case MPG123_ENC_SIGNED_8:
-            nPoint = done / sizeof(char);
-            for (iPoint = 0; iPoint < nPoint; iPoint += nChannel)
+        case 16 :
+            for (iPoint = 0; iPoint < nsample; iPoint += nchannel)
             {
-                buffer[index] = 0.0f;
-                for (iChannel = 0; iChannel < nChannel ; iChannel++)
+                input_buffer[index] = 0.0f;
+                for (iChannel = 0; iChannel < nchannel ; iChannel++)
                 {
-                    buffer[index] += abs(((char *)decbuf)[iPoint + iChannel]) / (float)SCHAR_MAX;
+                    input_buffer[index] += abs(((short *)input_buffer)[iPoint + iChannel]) / (float)SHRT_MAX;
                 }
-                buffer[index++] /= nChannel;
-                if (index >= nbsamples) break;
+                buffer[index++] /= nchannel;
             }
             break;
-        case MPG123_ENC_FLOAT_32:
-            nPoint = done / sizeof(float);
-            for (iPoint = 0; iPoint < nPoint; iPoint += nChannel)
+        case 32:
+            for (iPoint = 0; iPoint < nsample; iPoint += nchannel)
             {
-                buffer[index] = 0.0f;
-                for (iChannel = 0; iChannel < nChannel; iChannel++)
+                input_buffer[index] = 0.0f;
+                for (iChannel = 0; iChannel < nchannel; iChannel++)
                 {
-                    buffer[index] += fabsf(((float *)decbuf)[iPoint + iChannel]);
+                    input_buffer[index] += fabsf(((float *)input_buffer)[iPoint + iChannel]);
                 }
-                buffer[index++] /= nChannel;
-                if (index >= nbsamples) break;
+                buffer[index++] /= nchannel;
             }
             break;
         default:
-            done = 0;
+            index = 0;
         }
-
-    }
-    while (ret == MPG123_OK && index < nbsamples);
-
-    mpg123_close(m);
-    mpg123_delete(m);
-    mpg123_exit();
-
-    return buffer_auto.release();
+    return buffer;
 }
 
-static
-float *readaudio_snd(
-    const char *filename,
-    long *sr,
-    const float nbsecs,
-    size_t *buflen)
+float *AudioReader::readAudio(
+    const char *stream_type,
+    size_t *nchannel,
+    size_t *sample_resolution,
+    size_t *sample_rate,
+    unsigned char *buffer,
+    size_t *nsample,
+    size_t *output_buffer_length)
 {
+    long dist_sample_rate = SAMPLE_RATE;
 
-    SF_INFO sf_info;
-    sf_info.format = 0;
-    SNDFILE *sndfile = sf_open(filename, SFM_READ, &sf_info);
-    if (sndfile == NULL)
+    float *input_buffer;
+    input_buffer = readAudioPCM(nchannel, sample_resolution, buffer, nsample)
+
+    if (dist_sample_rate == orig_sr)
     {
-        throw FileOpenError();
+        *output_buffer_length = &nsample;
+        return input_buffer;
     }
 
-    /* normalize */
-    sf_command(sndfile, SFC_SET_NORM_FLOAT, NULL, SF_TRUE);
-
-    *sr = (long)sf_info.samplerate;
-
-    //allocate input buffer for signal
-    sf_count_t src_frames = (nbsecs <= 0) ? sf_info.frames : (nbsecs * sf_info.samplerate);
-    src_frames = (sf_info.frames < src_frames) ? sf_info.frames : src_frames;
-    float *inbuf = new float[src_frames * sf_info.channels];
-    auto_ptr<float> inbuf_auto(inbuf);
-
-    /*read frames */
-    sf_count_t cnt_frames = sf_readf_float(sndfile, inbuf, src_frames);
-
-    float *buf = new float[cnt_frames];
-    auto_ptr<float> buf_auto(buf);
-
-    //average across all channels
-    sf_count_t  i, j, indx = 0;
-    for (i = 0; i < cnt_frames * sf_info.channels; i += sf_info.channels)
-    {
-        buf[indx] = 0;
-        for (j = 0; j < sf_info.channels; j++)
-        {
-            buf[indx] += fabsf(inbuf[i + j]);
-        }
-        buf[indx++] /= sf_info.channels;
-    }
-
-    *buflen = indx;
-    sf_close(sndfile);
-    return buf_auto.release();
-}
-
-float *AudioReader::readaudio(
-    const char *filename,
-    size_t *buflen)
-{
-    assert (NULL != filename);
-
-    long orig_sr;
-    long sr = SAMPLE_RATE;
-    size_t inbufferlength;
-    *buflen = 0;
-
-    const char *suffix = strrchr(filename, '.');
-    if (NULL == suffix)
-    {
-        throw InvalidInputError();
-    }
-
-    float *inbuffer;
-    if (!strcasecmp(suffix, ".mp3"))
-    {
-        inbuffer = readaudio_mp3(filename, &orig_sr, 0, &inbufferlength);
-    }
-    else
-    {
-        inbuffer = readaudio_snd(filename, &orig_sr, 0, &inbufferlength);
-    }
-
-    if (sr == orig_sr)
-    {
-        *buflen = inbufferlength;
-        return inbuffer;
-    }
-
-    auto_ptr<float> inbuffer_auto(inbuffer);
+    auto_ptr<float> inbuffer_auto(input_buffer);
 
     /* resample float array */
-    /* set desired sr ratio */
-    double sr_ratio = (double)(sr) / (double)orig_sr;
+    /* set distribution sample rate ratio */
+    double sr_ratio = (double)(dist_sample_rate) / (double)sample_rate;
     if (src_is_valid_ratio(sr_ratio) == 0)
     {
         throw ResampleError();
     }
 
     /* allocate output buffer for conversion */
-    size_t outbufferlength = sr_ratio * inbufferlength;
+    size_t outbufferlength = sr_ratio * nsample;
     float *outbuffer = new float[outbufferlength];
     auto_ptr<float> outbuffer_auto(outbuffer);
 
@@ -248,7 +130,7 @@ float *AudioReader::readaudio(
     }
 
     *buflen = src_data.output_frames;
-
+    *output_buffer_length = src_data.output_frames;
     src_delete(src_state);
 
     return outbuffer_auto.release();

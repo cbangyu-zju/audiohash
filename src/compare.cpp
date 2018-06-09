@@ -41,9 +41,9 @@ unsigned block_bitcount(const uint32_t *hashA, const uint32_t *hashB, const unsi
     return result;
 }
 
-void Compare::setPattern(uint32_t *hash, uint32_t nframes, const char *name)
+void Compare::setPattern(uint32_t *hash, uint32_t nframes)
 {
-    pattern = {hash,nframes};
+    pattern = {hash, nframes};
 }
 
 float Compare::compare(const uint32_t *hashA, size_t nframes)
