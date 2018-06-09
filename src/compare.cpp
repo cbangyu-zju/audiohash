@@ -46,7 +46,7 @@ void Compare::setPattern(uint32_t *hash, uint32_t nframes)
     pattern = {hash, nframes};
 }
 
-float Compare::compare(const uint32_t *hashA, size_t nframes)
+float Compare::compare(const uint32_t *hash, uint32_t nframes)
 {
     return 0.5;
 }
