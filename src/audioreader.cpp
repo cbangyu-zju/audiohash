@@ -22,7 +22,7 @@ using std::auto_ptr;
 static float * readAudioPCM(
     size_t nchannel,
     size_t sample_resolution,
-    unsigned char input_buffer,
+    unsigned char *input_buffer,
     size_t nsample
 )
 {
@@ -83,7 +83,7 @@ float *AudioReader::readAudio(
     long dist_sample_rate = SAMPLE_RATE;
 
     float *input_buffer;
-    input_buffer = readAudioPCM(*nchannel, *sample_resolution, buffer, *nsample)
+    input_buffer = readAudioPCM(*nchannel, *sample_resolution, buffer, *nsample);
 
     if (dist_sample_rate == orig_sr)
     {
