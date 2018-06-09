@@ -85,9 +85,9 @@ float *AudioReader::readAudio(
     float *input_buffer;
     input_buffer = readAudioPCM(*nchannel, *sample_resolution, buffer, *nsample);
 
-    if (dist_sample_rate == orig_sr)
+    if (dist_sample_rate == sample_rate)
     {
-        *output_buffer_length = &nsample;
+        *output_buffer_length = *nsample;
         return input_buffer;
     }
 
@@ -95,15 +95,15 @@ float *AudioReader::readAudio(
 
     /* resample float array */
     /* set distribution sample rate ratio */
-    double sr_ratio = (double)(dist_sample_rate) / (double)sample_rate;
+    double sr_ratio = (double)(dist_sample_rate) / (double)(*sample_rate);
     if (src_is_valid_ratio(sr_ratio) == 0)
     {
         throw ResampleError();
     }
 
     /* allocate output buffer for conversion */
-    output_buffer_length = sr_ratio * nsample;
-    float *output_buffer = new float[output_buffer_length];
+    output_buffer_length = (size_t)(sr_ratio * nsample);
+    float *output_buffer = new float[int(output_buffer_length)];
     auto_ptr<float> output_buffer_auto(output_buffer);
 
     int error;
@@ -116,8 +116,8 @@ float *AudioReader::readAudio(
     SRC_DATA src_data;
     src_data.data_in = input_buffer;
     src_data.data_out = output_buffer;
-    src_data.input_frames = nsample;
-    src_data.output_frames = output_buffer_length;
+    src_data.input_frames = *nsample;
+    src_data.output_frames = *output_buffer_length;
     src_data.end_of_input = SF_TRUE;
     src_data.src_ratio = sr_ratio;
 
