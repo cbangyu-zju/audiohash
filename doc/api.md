@@ -1,5 +1,10 @@
 ## audiohash
 
+### 接口文件
+capi.h // 接口API
+
+aucompare.cpp // C++的调用sample
+
 ### 调用流程
 ```
 config = new_audiohash_config()
