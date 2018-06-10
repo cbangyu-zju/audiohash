@@ -1,9 +1,10 @@
 ## audiohash
 
 ### 接口文件
+```
 capi.h // 接口API
-
 aucompare.cpp // C++的调用sample
+```
 
 ### 调用流程
 ```
@@ -31,4 +32,11 @@ score = set_pattern_audio(  // 设置音频模版
 )
 
 print(score)
+```
+
+### 编译流程
+```
+cd audiohash/src  // 进入代码目录
+cmake ./          // 生成makefile文件
+make              // 生成接口文件 audiohash.so
 ```
