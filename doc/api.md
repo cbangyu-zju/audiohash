@@ -21,7 +21,7 @@ res = set_pattern_audio(  // 设置音频模版
 if res == 0:
 	print("模版设置成功")
 	
-score = set_pattern_audio(  // 设置音频模版
+score = audio_compare(  // 输入测试流，得到得分
 	config,
 	"PCM", // stream_type, 流类型
 	2, // channel, 声道个数，比如左右两声道，或者只有一个声道
