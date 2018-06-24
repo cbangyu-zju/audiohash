@@ -1,10 +1,6 @@
 #ifndef AUDIOHASH_CAPI_H
 #define AUDIOHASH_CAPI_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void *new_audiohash_config();
 
 void delete_audiohash_config(void *config);
@@ -24,9 +20,5 @@ float audio_compare(void *config,
                     size_t *sample_rate,
                     unsigned char *buffer,
                     size_t *nsample);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

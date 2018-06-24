@@ -1,9 +1,5 @@
 #include <cstdio>
-extern "C" {
 #include <stdint.h>
-}
-
-#include "error.h"
 #include "capi.h"
 #include "compare.h"
 #include "hashcalculator.h"

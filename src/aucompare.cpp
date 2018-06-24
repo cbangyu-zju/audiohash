@@ -44,5 +44,6 @@ int main(int argc, char **argv)
         printf("socre: %8.4lf\n", score);
     }
     */
+    printf("score: %f\n", score);
     return 0;
 }
