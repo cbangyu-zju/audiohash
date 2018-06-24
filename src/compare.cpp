@@ -1,10 +1,8 @@
 #include <cstdio>
 
-extern "C" {
-#include <stdint.h>
-}
 
 #include "compare.h"
+#include <math.h>
 
 using std::vector;
 
@@ -12,41 +10,25 @@ const uint32_t MASK_01010101 = (((uint32_t)(-1)) / 3);
 const uint32_t MASK_00110011 = (((uint32_t)(-1)) / 5);
 const uint32_t MASK_00001111 = (((uint32_t)(-1)) / 17);
 
-inline int bitcount(uint32_t n)
-{
-    n = (n & MASK_01010101) + ((n >> 1) & MASK_01010101) ;
-    n = (n & MASK_00110011) + ((n >> 2) & MASK_00110011) ;
-    n = (n & MASK_00001111) + ((n >> 4) & MASK_00001111) ;
-    return n % 255;
-}
-
-// a predefined shortcut
-inline float BERThreshold(size_t size)
-{
-    float thresholds[] = {0.05, 0.09, 0.20, 0.24, 0.27, 0.29};
-    unsigned nl = 6, il = size/10;
-
-    return il >= nl? thresholds[nl-1] : thresholds[il]; 
-}
-
-unsigned block_bitcount(const uint32_t *hashA, const uint32_t *hashB, const unsigned block_size)
-{
-    unsigned result = 0;
-    for (unsigned i = 0; i < block_size; i++)
-    {
-        uint32_t xordhash = hashA[i] ^ hashB[i];
-        result += bitcount(xordhash);
+float Compare::array_compare(const uint32_t *hashA, const uint32_t *hashB, size_t size){
+    float dot = 0.0, denom_a = 0.0, denom_b = 0.0 ;
+    for(unsigned int i = 0u; i < size; ++i) {
+        dot += hashA[i] * hashB[i] ;
+        denom_a += hashA[i] * hashA[i] ;
+        denom_b += hashB[i] * hashB[i] ;
     }
-
-    return result;
+    return dot / (sqrt(denom_a) * sqrt(denom_b)) ;
 }
 
-void Compare::setPattern(uint32_t *hash, uint32_t nframes)
+void Compare::setPattern(uint32_t *hash, size_t nframes)
 {
-    pattern = {hash, nframes};
+    pattern.hash = hash;
+    pattern.nframes = nframes;
 }
 
-float Compare::compare(const uint32_t *hash, uint32_t nframes)
+float Compare::compare(const uint32_t *hash, size_t nframes)
 {
-    return 0.5;
+    size_t compare_nframes = pattern.nframes>=nframes?nframes:pattern.nframes;
+    float score = array_compare(hash, pattern.hash, compare_nframes);
+    return score;
 }

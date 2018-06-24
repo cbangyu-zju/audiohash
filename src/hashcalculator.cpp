@@ -1,15 +1,12 @@
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
-extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
-}
 #include "hashcalculator.h"
 #include "fft.h"
 
-static
-double hz2bark(double f)
+static double hz2bark(double f)
 {
     double tmp = (26.81 * f / (1960 + f)) - 0.53;
     if (tmp < 2)
@@ -83,7 +80,7 @@ void HashCalculator::calc_FFT_bin(float *buf, double *magnF)
     // the 2 arrays require 96k in stack, consider moving them to heap later
     double frame[FRAME_LENGTH];
 
-    double complex pF[FRAME_LENGTH];
+    complex <double> pF[FRAME_LENGTH];
 
     for (unsigned i = 0; i < FRAME_LENGTH; i++)
     {
@@ -94,7 +91,7 @@ void HashCalculator::calc_FFT_bin(float *buf, double *magnF)
 
     for (unsigned i = 0; i < HALF_FFT; i++)
     {
-        magnF[i] = cabs(pF[i]);
+        magnF[i] = abs(pF[i]);
     }
 }
 

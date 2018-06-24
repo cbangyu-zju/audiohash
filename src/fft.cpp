@@ -1,27 +1,23 @@
 #include <cmath>
 
-extern "C" {
-#include <stdbool.h>
 #include <complex.h>
-}
-
+#include <stdbool.h>
 #include "fft.h"
 
-
 static
-double complex polar_to_complex(const double r, const double theta)
+complex <double> polar_to_complex(const double r, const double theta)
 {
-    double complex result;
-    result = r * cos(theta) + r * sin(theta) * I;
-
+    complex <double> result;
+    result.real(r * cos(theta));
+    result.imag(r * sin(theta));
     return result;
 }
 
 static
-void fft_calc(const int N, const double *x, double complex *X, double complex *P, const int step, const double complex *twids)
+void fft_calc(const int N, const double *x, complex <double> *X, complex <double> *P, const int step, const complex <double> *twids)
 {
     int k;
-    double complex *S = P + N / 2;
+    complex <double> *S = P + N / 2;
     if (N == 1)
     {
         X[0] = x[0];
@@ -42,8 +38,8 @@ void fft_calc(const int N, const double *x, double complex *X, double complex *P
 FFT::FFT(int window_size)
     : FFT_WINDOW(window_size), HALF_FFT(window_size >> 1)
 {
-    Xt = new double complex[FFT_WINDOW];
-    twiddle_factors = new double complex[HALF_FFT];
+    Xt = new complex <double>[FFT_WINDOW];
+    twiddle_factors = new complex <double>[HALF_FFT];
 
     for (int k = 0; k < FFT_WINDOW / 2; k++)
     {
@@ -57,7 +53,7 @@ FFT::~FFT()
     delete twiddle_factors;
 }
 
-void FFT::fft(const double *x, double complex *X)
+void FFT::fft(const double *x, complex <double> *X)
 {
     fft_calc(FFT_WINDOW, x, X, Xt, 1, twiddle_factors);
 }
