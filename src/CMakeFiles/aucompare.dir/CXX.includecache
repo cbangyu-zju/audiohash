@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/caibangyu/VSCode/audiohash/src/aucompare.cpp
+stdio.h
+-
+string.h
+-
+math.h
+-
+capi.h
+/Users/caibangyu/VSCode/audiohash/src/capi.h
+algorithm
+-
+
+/Users/caibangyu/VSCode/audiohash/src/capi.h
+stdint.h
+-
+

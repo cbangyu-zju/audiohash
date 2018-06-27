@@ -107,7 +107,7 @@ void HashCalculator::calc_Bark_bin(double *magnF, double *bark_bins)
     }
 }
 
-uint32_t *HashCalculator::calcHash(float *buf, size_t N, size_t *nframes)
+uint32_t *HashCalculator::calcHash(float *buf, int32_t N, int32_t *nframes)
 {
     double magnF[HALF_FFT], bark_bins[FILTS_COUNT];
 
