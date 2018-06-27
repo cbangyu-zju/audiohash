@@ -18,66 +18,34 @@ using std::auto_ptr;
 
 static void readAudioPCM(
     size_t nchannel,
-    size_t sample_resolution,
-    unsigned char *input_buffer,
+    float *input_buffer,
     float *output_buffer,
     size_t nsample
 )
 {
     size_t iChannel, iPoint, index = 0;
-
-    switch (sample_resolution)
+    for (iPoint = 0; iPoint < nsample; iPoint += nchannel)
+    {
+        output_buffer[index] = 0.0f;
+        for (iChannel = 0; iChannel < nchannel ; iChannel++)
         {
-        case 8:
-            for (iPoint = 0; iPoint < nsample; iPoint += nchannel)
-            {
-                output_buffer[index] = 0.0f;
-                for (iChannel = 0; iChannel < nchannel ; iChannel++)
-                {
-                    output_buffer[index] += abs(((char *)input_buffer)[iPoint + iChannel]) / (float)SCHAR_MAX;
-                }
-                output_buffer[index++] /= nchannel;
-            }
-            break;
-        case 16 :
-            for (iPoint = 0; iPoint < nsample; iPoint += nchannel)
-            {
-                output_buffer[index] = 0.0f;
-                for (iChannel = 0; iChannel < nchannel ; iChannel++)
-                {
-                    output_buffer[index] += abs(((short *)input_buffer)[iPoint + iChannel]) / (float)SHRT_MAX;
-                }
-                output_buffer[index++] /= nchannel;
-            }
-            break;
-        case 32:
-            for (iPoint = 0; iPoint < nsample; iPoint += nchannel)
-            {
-                output_buffer[index] = 0.0f;
-                for (iChannel = 0; iChannel < nchannel; iChannel++)
-                {
-                    output_buffer[index] += fabsf(((float *)input_buffer)[iPoint + iChannel]);
-                }
-                output_buffer[index++] /= nchannel;
-            }
-            break;
-        default:
-            break;
+            output_buffer[index] += fabs((input_buffer)[iPoint + iChannel]);
         }
+        output_buffer[index++] /= nchannel;
+    }
 }
+
 float *AudioReader::readAudio(
-    const char *stream_type,      // 音频流类型，目前只支持 PCM，WAV 格式的数据流也是PCM
     size_t *nchannel,             // 声道个数
-    size_t *sample_resolution,    // 采样位数，8位/16位/32位
     size_t *sample_rate,          // 采样时间分辨率
-    unsigned char *buffer,        // 采样流数据
+    float *buffer,        // 采样流数据
     size_t *nsample,              // 采样点数
     size_t *output_buffer_length) // 输出流数据长度
 {
     long dist_sample_rate = SAMPLE_RATE;
 
     float *input_buffer = new float[(*nsample)];;
-    readAudioPCM(*nchannel, *sample_resolution, buffer, input_buffer, *nsample);
+    readAudioPCM(*nchannel, buffer, input_buffer, *nsample);
     if (dist_sample_rate == *sample_rate)
     {
         *output_buffer_length = *nsample;

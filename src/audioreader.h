@@ -10,11 +10,9 @@ public:
     AudioReader(unsigned sr);
     ~AudioReader();
 
-    float *readAudio(const char *stream_type,
-                     size_t *nchannel,
-                     size_t *sample_resolution,
+    float *readAudio(size_t *nchannel,
                      size_t *sample_rate,
-                     unsigned char *buffer,
+                     float *buffer,
                      size_t *nsample,
                      size_t *output_buffer_length);
 };

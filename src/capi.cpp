@@ -42,12 +42,10 @@ void *new_audiohash_config()
 }
 
 int set_pattern_audio(void *_config,
-                      const char *stream_type,
-                      size_t *nchannel,
-                      size_t *sample_resolution,
-                      size_t *sample_rate,
-                      unsigned char *buffer,
-                      size_t *nsample)
+                      size_t nchannel,
+                      size_t sample_rate,
+                      float *buffer,
+                      size_t nsample)
 {
     int error = 0;
     size_t output_buffer_length, nframes;
@@ -57,7 +55,7 @@ int set_pattern_audio(void *_config,
 
     try
     {
-        sigbuf = config->reader->readAudio(stream_type, nchannel, sample_resolution, sample_rate, buffer, nsample, &output_buffer_length);
+        sigbuf = config->reader->readAudio(&nchannel, &sample_rate, buffer, &nsample, &output_buffer_length);
         hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes);
         config->compare->setPattern(hash, nframes);
     }
@@ -81,12 +79,10 @@ int set_pattern_audio(void *_config,
 }
 
 float audio_compare(void *_config,
-                    const char *stream_type,
-                    size_t *nchannel,
-                    size_t *sample_resolution,
-                    size_t *sample_rate,
-                    unsigned char *buffer,
-                    size_t *nsample)
+                    size_t nchannel,
+                    size_t sample_rate,
+                    float *buffer,
+                    size_t nsample)
 {
     int error = 0;
     size_t output_buffer_length, nframes;
@@ -97,7 +93,7 @@ float audio_compare(void *_config,
 
     try
     {
-        sigbuf = config->reader->readAudio(stream_type, nchannel, sample_resolution, sample_rate, buffer, nsample, &output_buffer_length);
+        sigbuf = config->reader->readAudio(&nchannel, &sample_rate, buffer, &nsample, &output_buffer_length);
         hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes);
         score = config->compare->compare(hash, nframes);
         return score;
