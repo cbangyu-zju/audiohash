@@ -12,19 +12,13 @@ struct AudioHashConfig
     AudioReader *const reader;
     HashCalculator *const calculator;
     Compare *const compare;
-    const float frame_time;
-    const float step_time;
 
     AudioHashConfig(
-        int sample_rate,
         int frame_length,
-        int step_length,
-        float minor_change)
-        : reader(new AudioReader(sample_rate))
-        , calculator(new HashCalculator(frame_length, step_length, sample_rate))
+        int step_length)
+        : reader(new AudioReader())
+        , calculator(new HashCalculator(frame_length, step_length))
         , compare(new Compare())
-        , frame_time(frame_length / (float)sample_rate)
-        , step_time(step_length / (float)sample_rate)
     {
     }
 
@@ -38,7 +32,7 @@ struct AudioHashConfig
 
 void *new_audiohash_config()
 {
-    return new AudioHashConfig(8000, 4000, 800, 0.001);
+    return new AudioHashConfig(4000, 800);
 }
 
 int set_pattern_audio(void *_config,
@@ -60,7 +54,7 @@ int set_pattern_audio(void *_config,
     try
     {
         sigbuf = config->reader->readAudio(&nchannel, &sample_rate, buffer, &nsample, &output_buffer_length);
-        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes, &nfeature);
+        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes, &nfeature, (int)sample_rate);
         config->compare->setPattern(hash, nframes, nfeature);
     }
     catch (std::exception &e)
@@ -102,7 +96,7 @@ float audio_compare(void *_config,
     try
     {
         sigbuf = config->reader->readAudio(&nchannel, &sample_rate, buffer, &nsample, &output_buffer_length);
-        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes, &nfeature);
+        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes, &nfeature, (int)sample_rate);
         score = config->compare->compare(hash, nframes);
         return score;
     }

@@ -6,10 +6,9 @@
 #include "hashcalculator.h"
 
 
-HashCalculator::HashCalculator(int frame_length, int step_length, int sample_rate, int max_freq, int min_freq, int step_freq){
+HashCalculator::HashCalculator(int frame_length, int step_length, int max_freq, int min_freq, int step_freq){
     FRAME_LENGTH = frame_length;
     STEP_LENGTH = step_length;
-    SAMPLE_RATE = sample_rate;
     MAX_FREQ = max_freq;
     MIN_FREQ = min_freq;
     STEP_FREQ = step_freq;
@@ -22,8 +21,8 @@ HashCalculator::~HashCalculator()
     delete mSpectral;
 }
 
-double *HashCalculator::calcHashEachWindow(double *data){
-    mSpectral->Pyulear(data, SAMPLE_RATE);
+double *HashCalculator::calcHashEachWindow(double *data, int sample_rate){
+    mSpectral->Pyulear(data, sample_rate);
     double *hash = new double[NUM_HASH];
     double psd_tem = 0;
     for(int fre_i = 0;fre_i<NUM_HASH;fre_i++)
@@ -34,7 +33,7 @@ double *HashCalculator::calcHashEachWindow(double *data){
     return hash;
 }
 
-double **HashCalculator::calcHash(float *buf, size_t nSample, size_t *nFrames, int *nFeature)
+double **HashCalculator::calcHash(float *buf, size_t nSample, size_t *nFrames, int *nFeature, int sample_rate)
 {
     *nFeature = NUM_HASH;
     *nFrames = nSample / STEP_LENGTH - FRAME_LENGTH / STEP_LENGTH + 1;
@@ -51,7 +50,7 @@ double **HashCalculator::calcHash(float *buf, size_t nSample, size_t *nFrames, i
                 buffer[i] = (double)buf[iFrames*STEP_LENGTH+i];
             }
         }
-        double *temp_hash = calcHashEachWindow(buffer);
+        double *temp_hash = calcHashEachWindow(buffer, sample_rate);
         for(int i = 0; i < NUM_HASH; i++){
             if(isnan(temp_hash[i]) == 0){
                 hash[iFrames][i] = temp_hash[i];

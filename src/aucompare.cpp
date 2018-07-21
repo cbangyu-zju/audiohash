@@ -190,6 +190,7 @@ int main(int argc, char **argv)
     const char *filename = "/Users/caibangyu/Desktop/audiohash/music/example.mp3";
     float *inbuffer;
     inbuffer = readaudio_mp3(filename, &orig_sr, 0, &inbufferlength);
+    printf("Read OK\n");
     error = set_pattern_audio(config, 1, (size_t)orig_sr, inbuffer, inbufferlength);
     if (0 != error)
     {

@@ -5,9 +5,7 @@
 class AudioReader
 {
 public:
-    const unsigned SAMPLE_RATE;
-
-    AudioReader(unsigned sr);
+    AudioReader();
     ~AudioReader();
 
     float *readAudio(size_t *nchannel,
