@@ -15,7 +15,9 @@ struct HashPattern
 class Compare{
 
 public:
-    HashPattern pattern;
+    HashPattern *pattern;
+    Compare();
+    ~Compare();
     void setPattern(double **hash, size_t nframes, int nfeature);
     double compare(double **hash, size_t nframes);
     double *preprocess(double **hash, size_t nframes, int nfeature, double *mean, double *std);

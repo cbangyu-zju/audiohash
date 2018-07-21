@@ -190,7 +190,6 @@ int main(int argc, char **argv)
     const char *filename = "/Users/caibangyu/Desktop/audiohash/music/example.mp3";
     float *inbuffer;
     inbuffer = readaudio_mp3(filename, &orig_sr, 0, &inbufferlength);
-    printf("%f, %f, %f, %f, %f, %f \n", inbuffer[995], inbuffer[996], inbuffer[997], inbuffer[998], inbuffer[999], inbuffer[1000]);
     error = set_pattern_audio(config, 1, (size_t)orig_sr, inbuffer, inbufferlength);
     if (0 != error)
     {
@@ -199,7 +198,7 @@ int main(int argc, char **argv)
     }
     printf("compare!\n");
 
-    score = audio_compare(config, 1, (size_t)orig_sr, inbuffer, inbufferlength);
+    score = audio_compare(config, nchannel, sample_rate, buffer, nsample);
 
     /*
     if (0 == score)

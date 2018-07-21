@@ -19,6 +19,7 @@ HashCalculator::HashCalculator(int frame_length, int step_length, int sample_rat
 
 HashCalculator::~HashCalculator()
 {
+    delete mSpectral;
 }
 
 double *HashCalculator::calcHashEachWindow(double *data){
@@ -52,7 +53,11 @@ double **HashCalculator::calcHash(float *buf, size_t nSample, size_t *nFrames, i
         }
         double *temp_hash = calcHashEachWindow(buffer);
         for(int i = 0; i < NUM_HASH; i++){
-            hash[iFrames][i] = temp_hash[i];
+            if(isnan(temp_hash[i]) == 0){
+                hash[iFrames][i] = temp_hash[i];
+            }else{
+                hash[iFrames][i] = 0;
+            }
         }
     }
     return hash;

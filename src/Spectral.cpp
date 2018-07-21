@@ -1,6 +1,6 @@
+#include <cmath>
+#include <cstdlib>
 #include "Spectral.h"
-#include"math.h"
-#include "stdlib.h"
 
 CSpectral::CSpectral(int winlen)
 {

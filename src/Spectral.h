@@ -1,9 +1,8 @@
-#pragma once
-
 #define ORDER 5
-#define PSD_LEN 10000
+#define PSD_LEN 4000
 #define LEVEL 512
 #define DOUBLE_PI 6.283
+
 class CSpectral
 {
 public:
