@@ -187,7 +187,7 @@ int main(int argc, char **argv)
     config = new_audiohash_config();
     size_t inbufferlength;
     long orig_sr;
-    const char *filename = "/Users/caibangyu/Desktop/audiohash/src/example.mp3";
+    const char *filename = "/Users/caibangyu/Desktop/audiohash/music/example.mp3";
     float *inbuffer;
     inbuffer = readaudio_mp3(filename, &orig_sr, 0, &inbufferlength);
     printf("%f, %f, %f, %f, %f, %f \n", inbuffer[995], inbuffer[996], inbuffer[997], inbuffer[998], inbuffer[999], inbuffer[1000]);
