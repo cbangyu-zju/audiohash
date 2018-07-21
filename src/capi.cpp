@@ -50,7 +50,7 @@ int set_pattern_audio(void *_config,
     int error = 0;
     size_t output_buffer_length, nframes;
     float *sigbuf = NULL;
-    uint32_t *hash = NULL;
+    double *hash = NULL;
     AudioHashConfig *config = (AudioHashConfig *)_config;
     if(nsample / (nchannel * 0.5) <= sample_rate){
         fprintf(stderr, "Sample is too short, must longer than 500ms!");
@@ -90,7 +90,7 @@ float audio_compare(void *_config,
     int error = 0;
     size_t output_buffer_length, nframes;
     float *sigbuf = NULL;
-    uint32_t *hash = NULL;
+    double *hash = NULL;
     float score = 0.5;
     AudioHashConfig *config = (AudioHashConfig *)_config;
     if(nsample / (nchannel * 0.5) <= sample_rate){

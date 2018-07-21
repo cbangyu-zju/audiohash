@@ -5,7 +5,7 @@
 
 struct HashPattern
 {
-    uint32_t *hash;
+    double *hash;
     size_t nframes;
 };
 
@@ -13,9 +13,9 @@ class Compare{
 
 public:
     HashPattern pattern;
-    void setPattern(uint32_t *hash, size_t nframes);
-    float compare(const uint32_t *hash, size_t nframes);
-    float array_compare(const uint32_t *hashA, const uint32_t *hashB, size_t size);
+    void setPattern(double *hash, size_t nframes);
+    double compare(const double *hash, size_t nframes);
+    double array_compare(const double *hashA, const double *hashB, size_t size);
 };
 
 #endif

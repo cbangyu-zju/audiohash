@@ -107,20 +107,13 @@ void HashCalculator::calc_Bark_bin(double *magnF, double *bark_bins)
     }
 }
 
-uint32_t *HashCalculator::calcHash(float *buf, size_t N, size_t *nframes)
+double *HashCalculator::calcHash(float *buf, size_t N, size_t *nframes)
 {
     double magnF[HALF_FFT], bark_bins[FILTS_COUNT];
 
-    double prev_diffs[FILTS_COUNT - 1], curr_diffs[FILTS_COUNT - 1];
-
     *nframes = 1 + (N - FRAME_LENGTH) / STEP_LENGTH;
 
-    uint32_t *hash = new uint32_t[*nframes];
-
-    for (unsigned i = 0; i < FILTS_COUNT - 1; i++)
-    {
-        prev_diffs[i] = 0.0;
-    }
+    double *hash = new double[*nframes];
 
     for (unsigned index = 0, start = 0, end = FRAME_LENGTH;
             end <= N;
@@ -130,23 +123,10 @@ uint32_t *HashCalculator::calcHash(float *buf, size_t N, size_t *nframes)
 
         calc_Bark_bin(magnF, bark_bins);
 
-        // calc hash for 32 bit
-        double curr_max_diff = 0;
-        for (unsigned m = 0; m < FILTS_COUNT - 1; m++)
+        double curr_hash = 0;
+        for (unsigned m = 0; m < FILTS_COUNT; m++)
         {
-            curr_diffs[m] = bark_bins[m] - bark_bins[m + 1];
-            curr_max_diff = fmax(curr_max_diff, curr_diffs[m]);
-        }
-
-        uint32_t curr_hash = 0;
-        for (unsigned m = 0; m < FILTS_COUNT - 1; m++)
-        {
-            if (curr_diffs[m] - prev_diffs[m] > MINOR_CHANGE * curr_max_diff) // ignore minor change
-            {
-                curr_hash |= 1 << m;
-            }
-
-            prev_diffs[m] = curr_diffs[m];
+            curr_hash += bark_bins[m];
         }
 
         hash[index] = curr_hash;
