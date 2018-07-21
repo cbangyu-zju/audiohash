@@ -18,8 +18,7 @@ struct AudioHashConfig
     AudioHashConfig(
         int sample_rate,
         int frame_length,
-        int step_length,
-        float minor_change)
+        int step_length)
         : reader(new AudioReader(sample_rate))
         , calculator(new HashCalculator(frame_length, step_length, sample_rate))
         , compare(new Compare())
@@ -38,7 +37,7 @@ struct AudioHashConfig
 
 void *new_audiohash_config()
 {
-    return new AudioHashConfig(8000, 4000, 800, 0.001);
+    return new AudioHashConfig(2000, 1000, 200);
 }
 
 int set_pattern_audio(void *_config,
