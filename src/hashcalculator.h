@@ -1,40 +1,34 @@
 #ifndef AUDIOHASH_AUDIOHASH_H
 #define AUDIOHASH_AUDIOHASH_H
 
-#include "fft.h"
-
-const unsigned MIN_FREQ = 50; // bark 0.5
-const unsigned MAX_FREQ = 3400; // bark 16.5
-const unsigned FILTS_COUNT = 33; // for 32-bit int
+#include "Spectral.h"
 
 class HashCalculator
 {
-    // smooth window function
-    double *window;
-
-    // weight matrix for fftbin2barkbin
-    double *wts[FILTS_COUNT];
-
-    FFT fft;
-
-    void calc_FFT_bin(float *buf, double *magnF);
-
-    void calc_Bark_bin(double *magnF, double *bark_bins);
 
 public:
     // the count of samples to generate a single hash value
-    const unsigned FRAME_LENGTH;
-    const unsigned HALF_FFT;
+    int FRAME_LENGTH;
 
     // the step length each time move fft window
-    const unsigned STEP_LENGTH;
-    const float MINOR_CHANGE;
+    int STEP_LENGTH;
+    
+    int SAMPLE_RATE;
+    
+    int MAX_FREQ;
+    int MIN_FREQ;
+    int STEP_FREQ;
+    int NUM_HASH;
+    
+    CSpectral *mSpectral;
 
-    HashCalculator(unsigned frame_length, unsigned step_length, unsigned sample_rate, float minor_change);
+    HashCalculator(int frame_length, int step_length, int sample_rate, int max_freq = 510, int min_freq = 10, int step_freq = 100);
 
     ~HashCalculator();
 
-    double *calcHash(float *buf, size_t N, size_t *nframes);
+    double **calcHash(float *buf, size_t nSample, size_t *nFrames, int *nFeature);
+
+    double *calcHashEachWindow(double *buf);
 };
 
 #endif

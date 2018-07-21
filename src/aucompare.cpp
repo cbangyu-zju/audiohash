@@ -15,6 +15,58 @@ void printHelp()
     fprintf(stderr, "compare audio \n");
 }
 
+static float *byte_to_float(const char *decbuf, size_t nChar, int nChannel, int sampleResolution, size_t *nSample){
+    size_t iPoint, index = 0;
+    int iChannel;
+    float *buffer = NULL;
+    switch (sampleResolution)
+    {
+        case 16 :
+            *nSample = nChar / sizeof(short);
+            buffer = new float[*nSample];
+            for (iPoint = 0; iPoint < *nSample; iPoint += nChannel)
+            {
+                buffer[index] = 0.0f;
+                for (iChannel = 0; iChannel < nChannel ; iChannel++)
+                {
+                    buffer[index] += abs(((short *)decbuf)[iPoint + iChannel]) / (float)32767;
+                }
+                buffer[index++] /= nChannel;
+            }
+            break;
+        case 8:
+            *nSample = nChar / sizeof(char);
+            buffer = new float[*nSample];
+            for (iPoint = 0; iPoint < *nSample; iPoint += nChannel)
+            {
+                buffer[index] = 0.0f;
+                for (iChannel = 0; iChannel < nChannel ; iChannel++)
+                {
+                    buffer[index] += abs(((char *)decbuf)[iPoint + iChannel]) / (float)127;
+                }
+                buffer[index++] /= nChannel;
+            }
+            break;
+        case 32:
+            *nSample = nChar / sizeof(float);
+            buffer = new float[*nSample];
+            for (iPoint = 0; iPoint < *nSample; iPoint += nChannel)
+            {
+                buffer[index] = 0.0f;
+                for (iChannel = 0; iChannel < nChannel; iChannel++)
+                {
+                    buffer[index] += fabsf(((float *)decbuf)[iPoint + iChannel]);
+                }
+                buffer[index++] /= nChannel;
+            }
+            break;
+        default:
+            *nSample = 0;
+    }
+    return buffer;
+
+}
+
 static
 float *readaudio_mp3(
                      const char *filename,
@@ -66,6 +118,7 @@ float *readaudio_mp3(
     do
     {
         ret = mpg123_read(m_handle, decbuf, decbuflen, &done);
+        //for(int read_i = 0; read_i < done; read_i++){printf("%d\n", abs(((char *)decbuf)[read_i]));}
         switch (encoding)
         {
             case MPG123_ENC_SIGNED_16 :
@@ -138,14 +191,15 @@ int main(int argc, char **argv)
     float *inbuffer;
     inbuffer = readaudio_mp3(filename, &orig_sr, 0, &inbufferlength);
     printf("%f, %f, %f, %f, %f, %f \n", inbuffer[995], inbuffer[996], inbuffer[997], inbuffer[998], inbuffer[999], inbuffer[1000]);
-    error = set_pattern_audio(config, nchannel, sample_rate, inbuffer, nsample);
+    error = set_pattern_audio(config, 1, (size_t)orig_sr, inbuffer, inbufferlength);
     if (0 != error)
     {
         delete_audiohash_config(config);
         return -1;
     }
+    printf("compare!\n");
 
-    score = audio_compare(config, nchannel, sample_rate, inbuffer, nsample);
+    score = audio_compare(config, 1, (size_t)orig_sr, inbuffer, inbufferlength);
 
     /*
     if (0 == score)

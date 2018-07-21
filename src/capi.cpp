@@ -16,12 +16,12 @@ struct AudioHashConfig
     const float step_time;
 
     AudioHashConfig(
-        unsigned sample_rate,
-        unsigned frame_length,
-        unsigned step_length,
+        int sample_rate,
+        int frame_length,
+        int step_length,
         float minor_change)
         : reader(new AudioReader(sample_rate))
-        , calculator(new HashCalculator(frame_length, step_length, sample_rate, minor_change))
+        , calculator(new HashCalculator(frame_length, step_length, sample_rate))
         , compare(new Compare())
         , frame_time(frame_length / (float)sample_rate)
         , step_time(step_length / (float)sample_rate)
@@ -38,7 +38,7 @@ struct AudioHashConfig
 
 void *new_audiohash_config()
 {
-    return new AudioHashConfig(8000, 4096, 400, 0.001);
+    return new AudioHashConfig(8000, 4000, 800, 0.001);
 }
 
 int set_pattern_audio(void *_config,
@@ -49,8 +49,9 @@ int set_pattern_audio(void *_config,
 {
     int error = 0;
     size_t output_buffer_length, nframes;
+    int nfeature;
     float *sigbuf = NULL;
-    double *hash = NULL;
+    double **hash = NULL;
     AudioHashConfig *config = (AudioHashConfig *)_config;
     if(nsample / (nchannel * 0.5) <= sample_rate){
         fprintf(stderr, "Sample is too short, must longer than 500ms!");
@@ -59,8 +60,8 @@ int set_pattern_audio(void *_config,
     try
     {
         sigbuf = config->reader->readAudio(&nchannel, &sample_rate, buffer, &nsample, &output_buffer_length);
-        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes);
-        config->compare->setPattern(hash, nframes);
+        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes, &nfeature);
+        config->compare->setPattern(hash, nframes, nfeature);
     }
     catch (std::exception &e)
     {
@@ -89,8 +90,9 @@ float audio_compare(void *_config,
 {
     int error = 0;
     size_t output_buffer_length, nframes;
+    int nfeature;
     float *sigbuf = NULL;
-    double *hash = NULL;
+    double **hash = NULL;
     float score = 0.5;
     AudioHashConfig *config = (AudioHashConfig *)_config;
     if(nsample / (nchannel * 0.5) <= sample_rate){
@@ -100,7 +102,7 @@ float audio_compare(void *_config,
     try
     {
         sigbuf = config->reader->readAudio(&nchannel, &sample_rate, buffer, &nsample, &output_buffer_length);
-        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes);
+        hash = config->calculator->calcHash(sigbuf, output_buffer_length, &nframes, &nfeature);
         score = config->compare->compare(hash, nframes);
         return score;
     }

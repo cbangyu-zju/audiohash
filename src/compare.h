@@ -5,17 +5,21 @@
 
 struct HashPattern
 {
-    double *hash;
+    double **hash;
+    double *mean;
+    double *std;
     size_t nframes;
+    int nfeature;
 };
 
 class Compare{
 
 public:
     HashPattern pattern;
-    void setPattern(double *hash, size_t nframes);
-    double compare(const double *hash, size_t nframes);
-    double array_compare(const double *hashA, const double *hashB, size_t size);
+    void setPattern(double **hash, size_t nframes, int nfeature);
+    double compare(double **hash, size_t nframes);
+    double *preprocess(double **hash, size_t nframes, int nfeature, double *mean, double *std);
+    double array_compare(double *hashA, double *hashB, size_t size);
 };
 
 #endif
