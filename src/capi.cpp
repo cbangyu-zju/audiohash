@@ -37,7 +37,7 @@ struct AudioHashConfig
 
 void *new_audiohash_config()
 {
-    return new AudioHashConfig(2000, 1000, 200);
+    return new AudioHashConfig(1000, 500, 100);
 }
 
 int set_pattern_audio(void *_config,
