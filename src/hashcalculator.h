@@ -22,7 +22,7 @@ public:
     
     CSpectral *mSpectral;
 
-    HashCalculator(int frame_length, int step_length, int sample_rate, int max_freq = 510, int min_freq = 10, int step_freq = 100);
+    HashCalculator(int frame_length, int step_length, int sample_rate, int max_freq = 310, int min_freq = 10, int step_freq = 50);
 
     ~HashCalculator();
 
