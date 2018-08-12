@@ -13,7 +13,7 @@ res = set_pattern_audio(  // 设置音频模版流
 	1, // size_t, channel, 声道个数，比如左右两声道，或者只有一个声道，建议只有1个声道，最多2个
 	16000, // size_t, sample_rate，采样率
 	dist_buffer, // float *, buffer，模版的原始流数据，流数据长度应该和采样点数相同
-	32000, // size_t, nsample，采样点个数，采样率*时间长度，建议输入时间片段：2-5s
+	32000, // size_t, nsample，采样点个数，采样率*时间长度*通道数，建议输入时间片段：2-5s
 )
 if res == 0:
 	print("模版设置成功")
@@ -23,7 +23,7 @@ score = audio_compare(  // 输入测试流，得到得分，建议输入时间�
 	1, // size_t, channel, 声道个数，比如左右两声道，或者只有一个声道，建议只有1个声道，最多2个
 	16000, // size_t, sample_rate，采样率
 	dist_buffer, // float *, buffer，模版的原始流数据，流数据长度应该和采样点数相同
-	32000, // size_t, nsample，采样点个数，采样率*时间长度，建议输入时间片段：2-5s
+	32000, // size_t, nsample，采样点个数，采样率*时间长度*通道数，建议输入时间片段：2-5s
 )
 
 print(score)
@@ -36,7 +36,8 @@ cmake ./          // 生成makefile文件
 make              // 生成接口文件 audiohash.so
 ```
 
-### 测试接口文件见 aucompare.cpp
+### 测试接口文件见 aucompare.cpp 
+正式使用该库时，需要把aucompare.cpp 文件移除。
 
 ```
 #include <stdio.h>
@@ -86,4 +87,11 @@ int main(int argc, char **argv)
     printf("score: %f\n", score);
     return 0;
 }
+```
+
+### 外部依赖库
+```
+libsamplerate
+作用：用于降采样，将44.1k采样的数据将采样到8k，然后进行数据分析。
+该库在各平台上的编译可以参考：https://github.com/cooado/samplerate
 ```
