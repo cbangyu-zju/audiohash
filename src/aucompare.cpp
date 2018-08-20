@@ -24,7 +24,7 @@ static float *byte_to_float(const char *decbuf, size_t nChar, int nChannel, int 
         case 16 :
             nPoint = nChar / sizeof(short);
             *nSample = nPoint / nChannel;
-            buffer = new float[*nPoint];
+            buffer = new float[*nSample];
             for (iPoint = 0; iPoint < nPoint; iPoint += nChannel)
             {
                 buffer[index] = 0.0f;
@@ -38,7 +38,7 @@ static float *byte_to_float(const char *decbuf, size_t nChar, int nChannel, int 
         case 8:
             nPoint = nChar / sizeof(short);
             *nSample = nPoint / nChannel;
-            buffer = new float[*nPoint];
+            buffer = new float[*nSample];
             for (iPoint = 0; iPoint < nPoint; iPoint += nChannel)
             {
                 buffer[index] = 0.0f;
@@ -52,7 +52,7 @@ static float *byte_to_float(const char *decbuf, size_t nChar, int nChannel, int 
         case 32:
             nPoint = nChar / sizeof(short);
             *nSample = nPoint / nChannel;
-            buffer = new float[*nPoint];
+            buffer = new float[*nSample];
             for (iPoint = 0; iPoint < nPoint; iPoint += nChannel)
             {
                 buffer[index] = 0.0f;
