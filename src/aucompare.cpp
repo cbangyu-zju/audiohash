@@ -179,18 +179,32 @@ int main(int argc, char **argv)
     void *config = NULL;
     int error = 0;
     double score = 0;
-    size_t nchannel = 1;
-    size_t sample_rate = 8000;
-    size_t nsample = 80000;
-    float buffer[80000] = {0.1};
-    fill_n(buffer, 80000, 0.1);
+    
+    // init default wave
+    //size_t nchannel = 1;
+    //size_t sample_rate = 8000;
+    //size_t nsample = 80000;
+    //float buffer[80000] = {0.1};
+    //fill_n(buffer, 80000, 0.1);
     config = new_audiohash_config();
-    size_t inbufferlength;
-    long orig_sr;
-    const char *filename = "/Users/caibangyu/Desktop/audiohash/music/example.mp3";
-    float *inbuffer;
-    inbuffer = readaudio_mp3(filename, &orig_sr, 0, &inbufferlength);
-    error = set_pattern_audio(config, 1, (size_t)orig_sr, inbuffer, inbufferlength);
+    
+    // read standard redio
+    size_t std_buffer_length;
+    long std_orig_sr;
+    size_t std_nchannel = 1;
+    const char *std_filename = "/Users/caibangyu/VSCode/audiohash/music/standard.mp3";
+    float *std_buffer;
+    std_buffer = readaudio_mp3(std_filename, &std_orig_sr, 0, &std_buffer_length);
+
+    // read compare redio
+    size_t compare_buffer_length;
+    long compare_orig_sr;
+    size_t compare_nchannel = 1;
+    const char *compare_filename = "/Users/caibangyu/VSCode/audiohash/music/compare.mp3";
+    float *compare_buffer;
+    compare_buffer = readaudio_mp3(compare_filename, &compare_orig_sr, 0, &compare_buffer_length);
+
+    error = set_pattern_audio(config, std_nchannel, (size_t)std_orig_sr, std_buffer, std_buffer_length);
     if (0 != error)
     {
         delete_audiohash_config(config);
@@ -198,7 +212,7 @@ int main(int argc, char **argv)
     }
     printf("compare!\n");
 
-    score = audio_compare(config, nchannel, sample_rate, buffer, nsample);
+    score = audio_compare(config, compare_nchannel, (size_t)std_orig_sr, compare_buffer, compare_buffer_length);
 
     /*
     if (0 == score)
