@@ -16,15 +16,16 @@ void printHelp()
 }
 
 static float *byte_to_float(const char *decbuf, size_t nChar, int nChannel, int sampleResolution, size_t *nSample){
-    size_t iPoint, index = 0;
+    size_t iPoint, nPoint, index = 0;
     int iChannel;
     float *buffer = NULL;
     switch (sampleResolution)
     {
         case 16 :
-            *nSample = nChar / sizeof(short);
-            buffer = new float[*nSample];
-            for (iPoint = 0; iPoint < *nSample; iPoint += nChannel)
+            nPoint = nChar / sizeof(short);
+            *nSample = nPoint / nChannel;
+            buffer = new float[*nPoint];
+            for (iPoint = 0; iPoint < nPoint; iPoint += nChannel)
             {
                 buffer[index] = 0.0f;
                 for (iChannel = 0; iChannel < nChannel ; iChannel++)
@@ -35,9 +36,10 @@ static float *byte_to_float(const char *decbuf, size_t nChar, int nChannel, int 
             }
             break;
         case 8:
-            *nSample = nChar / sizeof(char);
-            buffer = new float[*nSample];
-            for (iPoint = 0; iPoint < *nSample; iPoint += nChannel)
+            nPoint = nChar / sizeof(short);
+            *nSample = nPoint / nChannel;
+            buffer = new float[*nPoint];
+            for (iPoint = 0; iPoint < nPoint; iPoint += nChannel)
             {
                 buffer[index] = 0.0f;
                 for (iChannel = 0; iChannel < nChannel ; iChannel++)
@@ -48,9 +50,10 @@ static float *byte_to_float(const char *decbuf, size_t nChar, int nChannel, int 
             }
             break;
         case 32:
-            *nSample = nChar / sizeof(float);
-            buffer = new float[*nSample];
-            for (iPoint = 0; iPoint < *nSample; iPoint += nChannel)
+            nPoint = nChar / sizeof(short);
+            *nSample = nPoint / nChannel;
+            buffer = new float[*nPoint];
+            for (iPoint = 0; iPoint < nPoint; iPoint += nChannel)
             {
                 buffer[index] = 0.0f;
                 for (iChannel = 0; iChannel < nChannel; iChannel++)
