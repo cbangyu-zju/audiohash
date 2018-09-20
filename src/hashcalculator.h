@@ -1,5 +1,5 @@
-#ifndef AUDIOHASH_AUDIOHASH_H
-#define AUDIOHASH_AUDIOHASH_H
+#ifndef AUDIOCOMPARE_HASHCALCULATOR_H
+#define AUDIOCOMPARE_HASHCALCULATOR_H
 
 #include "Spectral.h"
 
@@ -26,9 +26,9 @@ public:
 
     ~HashCalculator();
 
-    double **calcHash(float *buf, size_t nSample, size_t *nFrames, int *nFeature);
+    double *calcHash(float *buf, size_t nSample, size_t *nFrames, int *nFeature);
 
-    double *calcHashEachWindow(double *buf);
+    void calcHashEachWindow(double *buf, double *hash);
 };
 
 #endif

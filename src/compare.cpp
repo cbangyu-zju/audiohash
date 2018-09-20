@@ -4,19 +4,17 @@
 using std::vector;
 
 Compare::Compare(){
-    pattern = new HashPattern();
 }
 
 Compare::~Compare()
 {
-    delete pattern;
 }
 
-double *Compare::preprocess(double **hash, size_t nframes, int nfeature, double *mean, double *std){
+double *Compare::preprocess(double *hash, size_t nframes, int nfeature, double *mean, double *std){
     double *feature = new double[nframes*nfeature];
-    for(int j = 0; j < nfeature; j++){
-        for(int i = 0; i < nframes; i++){
-            feature[i*nfeature + j] = (hash[i][j] - mean[j]) / std[j];
+    for(int i = 0; i < nfeature; i++){
+        for(int j = 0; j < nframes; j++){
+            feature[i*nframes + i] = (hash[i*nframes + i] - mean[i]) / std[i];
         }
     }
     return feature;
@@ -37,37 +35,38 @@ double Compare::array_compare(double *hashA, double *hashB, size_t size){
     }
 }
 
-void Compare::setPattern(double **hash, size_t nframes, int nfeature)
+void Compare::get_mean_and_std(double *hash, size_t nframes, int nfeature, double *means, double *stds)
 {
-    pattern->hash = hash;
-    pattern->nframes = nframes;
-    pattern->nfeature = nfeature;
-    pattern->mean = new double[nfeature];
-    pattern->std = new double[nfeature];
     for(int i = 0; i< nfeature; i++){
         double mean = 0.0;
         double std = 0.0;
         for(int j = 0; j<nframes;j++){
-            mean += hash[j][i];
+            mean += hash[j*nfeature + i];
         }
         mean = mean / nframes;
         for(int j = 0; j<nframes;j++){
-            std += (hash[j][i] - mean)*(hash[j][i] - mean);
+            std += (hash[j*nfeature + i] - mean)*(hash[j*nfeature + i] - mean);
         }
         std = sqrt(std) / nframes;
         if(std == 0){std = 1;}
-        pattern->mean[i] = mean;
-        pattern->std[i] = std;
+        means[i] = mean;
+        stds[i] = std;
     }
 
 }
  
 
-double Compare::compare(double **hash, size_t nframes)
+double Compare::compare(double *template_hash, size_t template_nframes, int template_nfeatures, double *compare_hash, size_t compare_nframes, int compare_nfeatures)
 {
-    size_t compare_nframes = pattern->nframes>=nframes?nframes:pattern->nframes;
-    double *feature_pattern = preprocess(pattern->hash, compare_nframes, pattern->nfeature, pattern->mean, pattern->std);
-    double *feature_compare = preprocess(hash, compare_nframes, pattern->nfeature, pattern->mean, pattern->std);
-    float score = array_compare(feature_pattern, feature_compare, compare_nframes);
+    size_t nframe = template_nframes>=compare_nframes?compare_nframes:template_nframes;
+    double *means, *stds;
+    means = new double[template_nfeatures];
+    stds = new  double[template_nfeatures];
+    get_mean_and_std(template_hash, nframe, template_nfeatures, means, stds);
+    double *feature_template = preprocess(template_hash, nframe, template_nfeatures, means, stds);
+    double *feature_compare = preprocess(compare_hash, compare_nframes, template_nfeatures, means, stds);
+    float score = array_compare(feature_template, feature_compare, nframe);
+    delete means;
+    delete stds;
     return score;
 }

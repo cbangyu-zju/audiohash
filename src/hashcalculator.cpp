@@ -22,26 +22,26 @@ HashCalculator::~HashCalculator()
     delete mSpectral;
 }
 
-double *HashCalculator::calcHashEachWindow(double *data){
+void HashCalculator::calcHashEachWindow(double *data, double *hash){
     mSpectral->Pyulear(data, SAMPLE_RATE);
-    double *hash = new double[NUM_HASH];
     double psd_tem = 0;
     for(int fre_i = 0;fre_i<NUM_HASH;fre_i++)
     {
         psd_tem = mSpectral->selectPSDFeature(MIN_FREQ+fre_i*STEP_FREQ,MIN_FREQ+(fre_i+1)*STEP_FREQ);
         hash[fre_i] =psd_tem;
     }
-    return hash;
 }
 
-double **HashCalculator::calcHash(float *buf, size_t nSample, size_t *nFrames, int *nFeature)
+double *HashCalculator::calcHash(float *buf, size_t nSample, size_t *nFrames, int *nFeature)
 {
     *nFeature = NUM_HASH;
     *nFrames = nSample / STEP_LENGTH - FRAME_LENGTH / STEP_LENGTH + 1;
-    double **hash = new double* [*nFrames];
-    for(int i = 0; i < *nFrames; i++){
-        hash[i] = new double[*nFeature];
-    }
+    int length = (int)(*nFeature) * (int)(*nFrames);
+    double *hash;
+    hash = new double[length];
+    double *temp_hash;
+    temp_hash = new double[NUM_HASH];
+
     for(size_t iFrames = 0; iFrames < *nFrames; iFrames ++){
         double *buffer = new double[FRAME_LENGTH];
         for(int i = 0; i < FRAME_LENGTH; i++){
@@ -51,12 +51,12 @@ double **HashCalculator::calcHash(float *buf, size_t nSample, size_t *nFrames, i
                 buffer[i] = (double)buf[iFrames*STEP_LENGTH+i];
             }
         }
-        double *temp_hash = calcHashEachWindow(buffer);
+        calcHashEachWindow(buffer, temp_hash);
         for(int i = 0; i < NUM_HASH; i++){
             if(isnan(temp_hash[i]) == 0){
-                hash[iFrames][i] = temp_hash[i];
+                hash[iFrames*NUM_HASH + i] = temp_hash[i];
             }else{
-                hash[iFrames][i] = 0;
+                hash[iFrames*NUM_HASH + i] = 0;
             }
         }
     }

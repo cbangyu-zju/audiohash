@@ -1,5 +1,5 @@
-#ifndef AUDIOHASH_COMPARE_H
-#define AUDIOHASH_COMPARE_H
+#ifndef AUDIOCOMPARE_COMPARE_H
+#define AUDIOCOMPARE_COMPARE_H
 
 #include <vector>
 
@@ -15,12 +15,11 @@ struct HashPattern
 class Compare{
 
 public:
-    HashPattern *pattern;
     Compare();
     ~Compare();
-    void setPattern(double **hash, size_t nframes, int nfeature);
-    double compare(double **hash, size_t nframes);
-    double *preprocess(double **hash, size_t nframes, int nfeature, double *mean, double *std);
+    double compare(double *template_hash, size_t template_nframes, int template_nfeatures, double *compare_hash, size_t compare_nframes, int compare_nfeatures);
+    void get_mean_and_std(double *hash, size_t nframes, int nfeature, double *means, double *stds);
+    double *preprocess(double *hash, size_t nframes, int nfeature, double *mean, double *std);
     double array_compare(double *hashA, double *hashB, size_t size);
 };
 

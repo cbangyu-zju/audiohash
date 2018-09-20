@@ -1,5 +1,5 @@
-#ifndef AUDIOHASH_AUDIOREADER_H
-#define AUDIOHASH_AUDIOREADER_H
+#ifndef AUDIOCOMPARE_AUDIOREADER_H
+#define AUDIOCOMPARE_AUDIOREADER_H
 
 
 class AudioReader
@@ -9,12 +9,14 @@ public:
 
     AudioReader(unsigned sr);
     ~AudioReader();
-
-    float *readAudio(size_t *nchannel,
-                     size_t *sample_rate,
+    
+    float *readAndDownSampleMp3(const char *filename, size_t *nframe);
+    float *readMp3(const char *filename, size_t * sample_rate, size_t *nframe);
+    float *downSamepleAudio(
                      float *buffer,
-                     size_t *nsample,
-                     size_t *output_buffer_length);
+                     size_t *input_sample_rate,
+                     size_t *input_nframe,
+                     size_t *output_nframe);
 };
 
 #endif
